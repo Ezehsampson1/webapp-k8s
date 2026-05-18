@@ -9,22 +9,22 @@ A GitOps-friendly Kubernetes deployment for `webapp` (nginx) across `staging` an
 ```
 k8s/
 ├── base/
-│   ├── deployment.yaml       # Core Deployment spec (image tag absent — set by overlay)
-│   ├── service.yaml          # ClusterIP Service on port 80
-│   └── kustomization.yaml    # Base resource list
+│   ├── deployment.yaml       
+│   ├── service.yaml          
+│   └── kustomization.yaml    
 ├── overlays/
 │   ├── staging/
-│   │   ├── namespace.yaml        # Namespace: staging
-│   │   ├── replicas-patch.yaml   # Replica count: 1
-│   │   ├── sealed-secret.yaml    # Encrypted secret (safe to commit)
-│   │   └── kustomization.yaml    # Wires base + patches + image tag
+│   │   ├── namespace.yaml        
+│   │   ├── replicas-patch.yaml  
+│   │   ├── sealed-secret.yaml    
+│   │   └── kustomization.yaml    
 │   └── production/
-│       ├── namespace.yaml        # Namespace: production
-│       ├── replicas-patch.yaml   # Replica count: 3
-│       ├── sealed-secret.yaml    # Encrypted secret (safe to commit)
-│       └── kustomization.yaml    # Wires base + patches + image tag
+│       ├── namespace.yaml        
+│       ├── replicas-patch.yaml   
+│       ├── sealed-secret.yaml    
+│       └── kustomization.yaml    
 └── infrastructure/
-    └── sealed-secrets-controller.yaml  # Controller installation docs + commands
+    └── sealed-secrets-controller.yaml  
 ```
 
 ---
@@ -351,18 +351,3 @@ Namespace-based isolation is simple and sufficient for this assessment. The risk
 
 ---
 
-## What I Would Improve Given More Time
-
-1. **Ingress manifests** — add environment-specific Ingress resources (e.g. `webapp.staging.example.com` vs `webapp.example.com`) with TLS termination via cert-manager.
-
-2. **PodDisruptionBudget for production** — ensure rolling updates cannot take all 3 production replicas down simultaneously.
-
-3. **HorizontalPodAutoscaler** — replace the fixed 3-replica count in production with an HPA that scales based on CPU/memory, giving the overlay a ceiling rather than a fixed number.
-
-4. **Liveness and readiness probes** — the nginx container is healthy by default, but real applications need explicit health check paths configured.
-
-5. **NetworkPolicy** — restrict ingress/egress per namespace so staging and production pods cannot communicate with each other even within the same cluster.
-
-6. **CI pipeline** — add a GitHub Actions workflow that runs `kustomize build` on pull requests to catch YAML errors before merge, and optionally `kubeconform` for schema validation.
-
-7. **Sealed Secrets key rotation** — document and automate the key backup and rotation procedure, which is a critical operational concern that's easy to overlook until a disaster occurs.
