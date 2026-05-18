@@ -1,0 +1,18 @@
+# NEVER commit plaintext Kubernetes secrets
+# These are the files you create locally before sealing — delete after use
+secret.yaml
+*-secret-plaintext.yaml
+/tmp/
+
+# Sealed Secrets private key backup — store in a secrets manager, not Git
+sealed-secrets-key-backup.yaml
+*-key-backup.yaml
+
+# Kubeseal certificate (public key — technically safe, but not needed in repo)
+pub-cert.pem
+
+# OS and editor noise
+.DS_Store
+.idea/
+*.swp
+*.swo
